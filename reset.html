@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reset password · TBD Auction</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #F8F8F8; color: #0A0A0A; margin: 0; padding: 32px 20px; text-align: center; }
+    .card { max-width: 420px; margin: 40px auto; background: #fff; border-radius: 16px; padding: 28px 22px; box-shadow: 0 8px 24px #00000014; }
+    h1 { font-size: 22px; margin: 0 0 10px; }
+    p { color: #666; line-height: 1.5; }
+    input { width: 100%; box-sizing: border-box; margin-top: 10px; padding: 12px 14px; border: 1px solid #E2E2E2; border-radius: 10px; font-size: 16px; }
+    .btn {
+      display: block; margin-top: 16px; background: #CC1A1A; color: #fff; text-decoration: none; border: 0;
+      border-radius: 10px; padding: 14px 20px; font-weight: 700; font-size: 16px; cursor: pointer; width: 100%; box-sizing: border-box;
+    }
+    .btn.secondary { background: #fff; color: #CC1A1A; border: 1px solid #CC1A1A; }
+    .err { color: #CC1A1A; min-height: 1.2em; }
+    .ok { color: #10B981; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Reset your password</h1>
+    <p>Choose a new password of at least 6 characters, then sign in on the TBD Auction app.</p>
+    <input id="pw1" type="password" placeholder="New password" autocomplete="new-password" />
+    <input id="pw2" type="password" placeholder="Confirm password" autocomplete="new-password" />
+    <p class="err" id="err"></p>
+    <button class="btn" id="save" type="button">Save new password</button>
+    <p class="ok hidden" id="saved">Password saved. Open the app and sign in.</p>
+    <a class="btn secondary" id="open" href="tbdauc://login-callback">Open TBD Auction</a>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    (function () {
+      var payload = (location.search || '') + (location.hash || '');
+      document.getElementById('open').href = 'tbdauc://login-callback' + payload;
+      var client = supabase.createClient(
+        'https://scfkjinpkskimcztlytu.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjZmtqaW5wa3NraW1jenRseXR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3NzIyMTIsImV4cCI6MjEwMzM0ODIxMn0.op1S4WVw2l2E9pHdI53FHkby-39qB8Z4o343anGAWGI'
+      );
+      document.getElementById('save').onclick = async function () {
+        var a = document.getElementById('pw1').value;
+        var b = document.getElementById('pw2').value;
+        var err = document.getElementById('err');
+        err.textContent = '';
+        if (!a || a.length < 6) { err.textContent = 'Use at least 6 characters.'; return; }
+        if (a !== b) { err.textContent = 'Passwords do not match.'; return; }
+        var res = await client.auth.updateUser({ password: a });
+        if (res.error) {
+          err.textContent = res.error.message + ' If this fails, tap Open TBD Auction and set the password in the app.';
+          return;
+        }
+        document.getElementById('saved').classList.remove('hidden');
+      };
+    })();
+  </script>
+</body>
+</html>

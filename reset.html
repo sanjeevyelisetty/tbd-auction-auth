@@ -47,10 +47,21 @@
         await client.auth.setSession({ access_token: access, refresh_token: refresh });
       }
       var session = (await client.auth.getSession()).data.session;
+      var code = new URLSearchParams(location.search).get('code');
       if (!session) {
         document.getElementById('form').classList.add('hidden');
-        document.getElementById('intro').textContent =
-          'This reset link has no session. Go back to the TBD Auction app, tap Forgot password, and open the newest email. Do not reuse an old link.';
+        if (code) {
+          document.getElementById('intro').innerHTML =
+            'This link must be finished in the app. Tap the button below, then set your new password there.';
+          var a = document.createElement('a');
+          a.className = 'btn';
+          a.href = 'tbdauc://login-callback' + location.search + location.hash;
+          a.textContent = 'Open TBD Auction';
+          document.querySelector('.card').appendChild(a);
+        } else {
+          document.getElementById('intro').textContent =
+            'This reset link was already used or has expired. You cannot reuse it. Wait about an hour, open the TBD Auction app, tap Forgot password, and use the new email only.';
+        }
         return;
       }
       document.getElementById('save').onclick = async function () {

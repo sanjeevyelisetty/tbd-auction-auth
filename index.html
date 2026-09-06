@@ -18,8 +18,9 @@
     (function () {
       var q = new URLSearchParams(location.search);
       var h = new URLSearchParams((location.hash || '').replace(/^#/, ''));
+      var raw = (location.search + location.hash).toLowerCase();
       var type = (q.get('type') || h.get('type') || '').toLowerCase();
-      if (type === 'recovery') {
+      if (type === 'recovery' || raw.indexOf('recovery') !== -1) {
         location.replace('reset.html' + location.search + location.hash);
       }
     })();
